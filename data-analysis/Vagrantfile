@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ENV["LC_ALL"] = "en_US.UTF-8"
+
+VAGRANTFILE_API_VERSION = "2"
+
+BOX_NAME = "generic/centos7"
+# BOX_URL =
+
+VM_NAME = "data-analysis"
+VM_CPU = 1
+VM_RAM = 1024
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = BOX_NAME
+  # config.vm.box_url = BOX_URL
+  config.vm.hostname = VM_NAME
+  config.vm.define VM_NAME
+
+  config.vm.network "public_network", bridge: "enp0s31f6"
+  config.vm.synced_folder "~/Projects/data-analysis", "/srv"
+
+  config.vm.provider "virtualbox" do |vb|
+      vb.name = VM_NAME
+      vb.memory = VM_RAM
+      vb.cpus = VM_CPU
+  end
+
+end
