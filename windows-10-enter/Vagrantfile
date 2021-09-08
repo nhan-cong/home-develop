@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ENV["LC_ALL"] = "en_US.UTF-8"
+
+VAGRANTFILE_API_VERSION = "2"
+
+BOX_NAME = "gusztavvargadr/windows-10"
+# BOX_URL =
+
+VM_NAME = "windows-10"
+VM_CPU = 2
+VM_RAM = 4096
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = BOX_NAME
+  # config.vm.box_url = BOX_URL
+  config.vm.hostname = VM_NAME
+  config.vm.define VM_NAME
+
+  config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+  config.vm.synced_folder "~/Downloads", "/Downloads"
+
+  config.vm.provider "virtualbox" do |vb|
+      vb.name = VM_NAME
+      vb.memory = VM_RAM
+      vb.cpus = VM_CPU
+  end
+
+end
