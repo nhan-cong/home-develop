@@ -8,9 +8,9 @@ VAGRANTFILE_API_VERSION = "2"
 BOX_NAME = "generic/centos7"
 # BOX_URL =
 
-VM_NAME = "data-analysis"
+VM_NAME = "gateway"
 VM_CPU = 1
-VM_RAM = 1024
+VM_RAM = 512
 
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -20,13 +20,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = VM_NAME
   config.vm.define VM_NAME
 
-  config.vm.network "public_network", bridge: "wlp2s0"
-  config.vm.synced_folder "~/Projects/", "/srv"
+  # Set network
+  # config.vm.network "public_network", bridge: "wlp2s0"
+  config.vm.network "private_network", ip: "192.168.56.2"
+  # Sync folder
+  config.vm.synced_folder "~/Projects/srv", "/srv"
+  config.vm.synced_folder ".", "/vagrant", disabled: false
 
+  # Config VM info
   config.vm.provider "virtualbox" do |vb|
       vb.name = VM_NAME
       vb.memory = VM_RAM
       vb.cpus = VM_CPU
+  end
+
+  # Run Ansible from the Vagrant VM
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "provisioning/playbook.yml"
   end
 
 end

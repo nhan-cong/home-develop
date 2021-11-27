@@ -1,0 +1,57 @@
+---
+- hosts: all
+  become: true
+  vars:
+    nginx_path: /etc/nginx
+    nginx_sites: "{{ nginx_path }}/conf.d"
+    doc_root: /srv/public_hmtl
+    server_name: gateway.local
+  tasks:
+    - name: Disable SELinux
+      selinux: state=disabled
+
+    - name: Install EPEL repo.
+      yum: name=epel-release state=present
+
+    - name: Import Remi GPG key.
+      rpm_key:
+        key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi"
+        state: present
+
+    - name: Install Remi repo.
+      yum:
+        name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+        state: present
+
+    - name: Web Access Firewall rules 80
+      firewalld:
+        zone: public
+        port: "{{ item.port }}/tcp"
+        permanent: yes
+        state: enabled
+      with_items:
+        - {port: "80"}
+
+    - name: Reload Firewalld service
+      service:
+        name: firewalld
+        state: restarted
+
+
+    - name: ensure nginx is at the latest version
+      yum: name=nginx state=latest
+
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: Apply Nginx template
+      template:
+        src: site.conf.j2
+        dest: "{{ nginx_sites }}/site.conf"
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
